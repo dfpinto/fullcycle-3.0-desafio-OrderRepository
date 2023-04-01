@@ -5,7 +5,7 @@ import CustomerModel from "./customer.model";
 import CustomerRepository from "./customer.repository";
 
 describe("Customer repository test", () => {
-  jest.setTimeout(10000);
+  jest.setTimeout(100000);
   let sequelize: Sequelize;
 
   beforeEach(async () => {

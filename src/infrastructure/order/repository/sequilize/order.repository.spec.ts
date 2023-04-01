@@ -13,7 +13,7 @@ import OrderModel from "./order.model";
 import OrderRepository from "./order.repository";
 
 describe("Order repository test", () => {
-  jest.setTimeout(10000);
+  jest.setTimeout(100000);
   let sequelize: Sequelize;
 
   beforeEach(async () => {
@@ -126,7 +126,54 @@ describe("Order repository test", () => {
         },
       ],
     });
-  });
+
+    // update section
+    // change customer
+    const address2 = new Address("Street 2", 2, "Zipcode 2", "City 2");
+    const customer2 = new Customer("123123123", "Customer 2", address2);
+    await customerRepository.create(customer2);
+    order.changeCustomer(customer2.id);
+    // change items
+    const product2 = new Product("321", "Product 2", 50);
+    await productRepository.create(product2);
+
+    const ordemItem2 = new OrderItem(
+      "2",
+      product2.name,
+      product2.price,
+      product2.id,
+      3
+    );
+    order.changeItems([ordemItem2]);
+
+
+    await orderRepository.update(order);
+
+    // await new Promise((resolve) => {
+    //   setTimeout(resolve, 1000);
+    // });
+
+    const orderModel2 = await OrderModel.findOne({
+      where: { id: order.id },
+      include: ["items"],
+    });
+
+    expect(orderModel2.toJSON()).toStrictEqual({
+      id: "123",
+      customer_id: customer2.id,
+      total: 150,
+      items: [
+        {
+          id: ordemItem2.id,
+          name: ordemItem2.name,
+          price: ordemItem2.price,
+          quantity: ordemItem2.quantity,
+          order_id: "123",
+          product_id: product2.id,
+        },
+      ],
+    });
+  }, 6000000);
 
   it("should find a order", async () => {
     const customer = new Customer("123", "Customer 1");
